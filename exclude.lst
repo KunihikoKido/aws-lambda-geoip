@@ -1,0 +1,14 @@
+*.pyc
+.gitignore
+lambda_function.zip
+requirements.txt
+event.json
+local_settings.py
+exclude.lst
+fabfile.py
+.git/*
+lib/*
+dist/*
+README.md
+*.dist-info/*
+*.egg-info
