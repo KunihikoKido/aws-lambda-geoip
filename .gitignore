@@ -95,3 +95,4 @@ lambda_function.zip
 local
 .tmp
 *.mmdb
+output.txt

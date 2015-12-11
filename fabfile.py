@@ -1,8 +1,14 @@
+# coding=utf-8
+import base64
+import json
 import os
-print os.getcwd()
 import zipfile
 
-from fabric.api import *
+from fabric.api import lcd
+from fabric.api import local
+from fabric.api import shell_env
+from fabric.api import task
+from fabric.contrib.console import confirm
 
 BASE_PATH = os.getcwd()
 
@@ -15,8 +21,10 @@ ZIP_EXCLUDE_FILE = os.path.join(BASE_PATH, 'exclude.lst')
 LAMBDA_HANDLER = 'lambda_handler'
 LAMBDA_FILE = 'lambda_function.py'
 LAMBDA_EVENT = 'event.json'
+LAMBDA_FUNCTION_NAME = os.path.basename(BASE_PATH)
 
 INSTALL_PREFIX = os.path.join(BASE_PATH, 'local')
+
 
 def install_python_modules():
     local('pip install --upgrade -r requirements.txt -t {}'.format(LIB_PATH))
@@ -27,12 +35,18 @@ def install_geolite2_database():
 
 @task
 def setup():
+    """
+    Setup on local machine.
+    """
     install_python_modules()
     install_geolite2_database()
 
 
 @task
 def clean():
+    """
+    Clean up lambda_function.zip, lib, local and tmp.
+    """
     local('rm -f lambda_function.zip')
     local('rm -rf {}'.format(LIB_PATH))
     local('rm -rf {}'.format(INSTALL_PREFIX))
@@ -40,6 +54,9 @@ def clean():
 
 @task
 def invoke(eventfile=LAMBDA_EVENT):
+    """
+    Invoke lambda function on local machine.
+    """
     with shell_env(PYTHONPATH=LIB_PATH):
         local('python-lambda-local -l {} -f {} {} {}'.format(
             LIB_PATH, LAMBDA_HANDLER, LAMBDA_FILE, eventfile
@@ -47,9 +64,51 @@ def invoke(eventfile=LAMBDA_EVENT):
 
 @task
 def makezip():
+    """
+    Make bundle zip file.
+    """
     with lcd(BASE_PATH):
         local('rm -f {}'.format(ZIP_FILE))
         local('zip -r9 {} * -x @{}'.format(ZIP_FILE, ZIP_EXCLUDE_FILE))
 
     with lcd(LIB_PATH):
         local('zip -r9 {} * -x @{}'.format(ZIP_FILE, ZIP_EXCLUDE_FILE))
+
+
+@task
+def awsupdate(function_name=LAMBDA_FUNCTION_NAME):
+    """
+    Update function code on AWS Lambda.
+    """
+    if confirm('Do you want to update function code on AWS Lambda?: {}'.format(function_name)):
+        if not os.path.exists(ZIP_FILE):
+            makezip()
+
+        local("""
+        aws lambda update-function-code \
+            --function-name {} \
+            --zip-file fileb://{}
+        """.format(function_name, ZIP_FILE))
+
+@task
+def awsinvoke(function_name=LAMBDA_FUNCTION_NAME):
+    """
+    Invoke function on AWS Lambda.
+    """
+    outputfile = 'output.txt'
+
+    result = local("""
+    aws lambda invoke \
+        --invocation-type RequestResponse \
+        --function-name {} \
+        --log-type Tail \
+        --payload file://{} \
+        {}
+    """.format(function_name, LAMBDA_EVENT, outputfile), capture=True)
+
+    result = json.loads(result)
+    print(base64.b64decode(result.get('LogResult', '')))
+
+    with open(outputfile) as f:
+        result = json.dumps(json.loads(f.read()), ensure_ascii=False, indent=2)
+        print(result)

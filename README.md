@@ -71,8 +71,9 @@ virtualenv env
 # 2. Activate the virtualenv
 source ~/env/bin/activate
 
-# 3. Install fabric and python-lambda-local
+# 3. Install fabric, awscli and python-lambda-local
 pip install fabric
+pip install awscli
 pip install python-lambda-local
 
 # 4. Clone repository
@@ -117,6 +118,41 @@ cd aws-lambda-geoip
 fab makezip
 ```
 ※ ZIPファイルは10MB超えるので、S3経由アップロードしてください。
+
+## Update function code on AWS Lambda
+
+```bash
+# 1. Activate virtualenv
+source ~/env/bin/activate
+cd aws-lambda-geoip
+
+# 2. Update function code on AWS Lambda.
+fab awsupdate
+```
+
+### Custom function name
+
+```bash
+fab awsupdate:function1
+```
+
+## Invoke function on AWS Lambda
+
+```bash
+# 1. Activate virtualenv
+source ~/env/bin/activate
+cd aws-lambda-geoip
+
+# 2. Update function code on AWS Lambda.
+fab awsinvoke
+```
+
+### Custom function name
+
+```bash
+fab awsupdate:function1
+```
+
 
 ## Snapshot Builds
 ビルド済みの``lambda_function.zip``は以下のURLを参照してください。
