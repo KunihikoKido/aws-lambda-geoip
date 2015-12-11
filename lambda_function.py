@@ -5,10 +5,14 @@ import json
 import geoip2.database
 from geoip2.errors import AddressNotFoundError
 
+from settings import logger
+
 LANGUAGES = ['ru', 'fr', 'en', 'de', 'zh-cn', 'pt-br', 'ja', 'es']
 DEFAULT_LANGUAGE = 'en'
 
 def lambda_handler(event, context):
+    logger.debug(json.dumps(event, ensure_ascii=False, indent=2))
+
     ip_address = event.get('ip_address', [])
     if isinstance(ip_address, basestring):
         ip_address = [ip_address]
@@ -44,5 +48,5 @@ def lambda_handler(event, context):
 
     reader.close()
 
-    print(json.dumps(items, ensure_ascii=False))
+    logger.debug(json.dumps(items, ensure_ascii=False, indent=2))
     return {'items': items}
