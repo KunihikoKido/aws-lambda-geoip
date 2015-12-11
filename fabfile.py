@@ -76,7 +76,7 @@ def makezip():
 
 
 @task(name='aws-lambda-update-function-code')
-def awsupdate(function_name=LAMBDA_FUNCTION_NAME):
+def aws_lambda_update_function_code(function_name=LAMBDA_FUNCTION_NAME):
     """
     Update function code on AWS Lambda.
     """
@@ -91,7 +91,7 @@ def awsupdate(function_name=LAMBDA_FUNCTION_NAME):
         """.format(function_name, ZIP_FILE))
 
 @task(name='aws-lambda-invoke')
-def awsinvoke(function_name=LAMBDA_FUNCTION_NAME):
+def aws_lambda_invoke(function_name=LAMBDA_FUNCTION_NAME):
     """
     Invoke function on AWS Lambda.
     """
