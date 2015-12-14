@@ -75,6 +75,7 @@ source ~/env/bin/activate
 pip install fabric
 pip install awscli
 pip install python-lambda-local
+pip install git+https://github.com/kunihikokido/fabric-aws-lambda.git
 
 # 4. Clone repository
 git clone https://github.com/KunihikoKido/aws-lambda-geoip.git
@@ -88,11 +89,6 @@ fab setup
 ローカルでLambda関数を実行するには、``fab invoke``コマンドを実行します。
 
 ```bash
-# 1. Activate virtualenv
-source ~/env/bin/activate
-cd aws-lambda-geoip
-
-# 2. Run lambda function on local machine
 fab invoke
 ```
 
@@ -110,49 +106,40 @@ fab invoke:custom-event.json
 以下のステップで、AWS Lambda に登録可能な ``lambda_function.zip`` ファイルが作成されます。
 
 ```bash
-# 1. Activate virtualenv
-source ~/env/bin/activate
-cd aws-lambda-geoip
-
-# 2 Make bundle zip for Lambda function
 fab makezip
 ```
+
 ※ ZIPファイルは10MB超えるので、S3経由アップロードしてください。
 
 ## Update function code on AWS Lambda
 
 ```bash
-# 1. Activate virtualenv
-source ~/env/bin/activate
-cd aws-lambda-geoip
-
-# 2. Update function code on AWS Lambda.
-fab aws-lambda-update-function-code
+fab aws-updatecode
 ```
 
 ### Custom function name
 
 ```bash
-fab aws-lambda-update-function-code:function1
+fab aws-updatecode:function1
 ```
 
 ## Invoke function on AWS Lambda
 
 ```bash
-# 1. Activate virtualenv
-source ~/env/bin/activate
-cd aws-lambda-geoip
-
-# 2. Update function code on AWS Lambda.
-fab aws-lambda-invoke
+fab aws-invoke
 ```
 
 ### Custom function name
 
 ```bash
-fab aws-lambda-invoke:function1
+fab aws-invoke:function1
 ```
 
+## Get function configuration on AWS Lambda
+
+```bash
+fab aws-getconfig
+```
 
 ## Snapshot Builds
 ビルド済みの``lambda_function.zip``は以下のURLを参照してください。
