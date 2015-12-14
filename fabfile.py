@@ -18,7 +18,7 @@ INSTALL_PREFIX = os.path.join(BASE_PATH, 'local')
 
 REQUIREMENTS_TXT = os.path.join(BASE_PATH, 'requirements.txt')
 
-LAMBDA_FUNCTION_NAME = 'geoip'
+LAMBDA_FUNCTION_NAME = os.path.basename(BASE_PATH)
 LAMBDA_HANDLER = 'lambda_handler'
 LAMBDA_FILE = os.path.join(BASE_PATH, 'lambda_function.py')
 
@@ -34,9 +34,8 @@ class SetupTask(BaseSetupTask):
         self.install_geolite2()
 
     def install_geolite2(self):
-        with lcd(BASE_PATH):
-            local('wget http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz')
-            local('gzip -d GeoLite2-City.mmdb.gz')
+        local('wget http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz')
+        local('gzip -d GeoLite2-City.mmdb.gz')
 
 @task
 def clean():
@@ -45,7 +44,7 @@ def clean():
 
 task_setup = SetupTask(
     requirements=REQUIREMENTS_TXT,
-    python_path=LIB_PATH,
+    lib_path=LIB_PATH,
     install_prefix=INSTALL_PREFIX
 )
 
@@ -53,13 +52,13 @@ task_invoke = InvokeTask(
     lambda_file=LAMBDA_FILE,
     lambda_handler=LAMBDA_HANDLER,
     event_file=EVENT_FILE,
-    python_path=LIB_PATH
+    lib_path=LIB_PATH
 )
 
 task_makezip = MakeZipTask(
     zip_file=ZIP_FILE,
     exclude_file=ZIP_EXCLUDE_FILE,
-    python_path=LIB_PATH
+    lib_path=LIB_PATH
 )
 
 task_aws_invoke = AWSLambdaInvokeTask(
