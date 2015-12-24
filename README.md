@@ -65,23 +65,18 @@ Execution result sample:
 ローカルでLambda関数を実行するには、最初に以下のステプで環境をセットアップしてください。
 
 ```bash
-# 1. Create a virtualenv
+# 1. Clone this repository with lambda function name.
+git clone https://github.com/KunihikoKido/aws-lambda-geoip.git geoip
+
+# 2. Create and activate a virtualenv
+cd geoip
 virtualenv env
+source env/bin/activate
 
-# 2. Activate the virtualenv
-source ~/env/bin/activate
+# 3. Install python modules for development.
+pip install -r requirements/local.txt
 
-# 3. Install fabric, awscli and python-lambda-local
-pip install fabric
-pip install awscli
-pip install python-lambda-local
-pip install git+https://github.com/kunihikokido/fabric-aws-lambda.git
-
-# 4. Clone repository
-git clone https://github.com/KunihikoKido/aws-lambda-geoip.git
-
-# 5. Install requirements modules
-cd aws-lambda-geoip
+# 4. Install python modules and geolite2 db for lambda function.
 fab setup
 ```
 
