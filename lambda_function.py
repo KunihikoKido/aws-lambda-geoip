@@ -5,7 +5,11 @@ import json
 import geoip2.database
 from geoip2.errors import AddressNotFoundError
 
-from settings import logger
+import settings
+
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(settings.LOG_LEVEL)
 
 LANGUAGES = ['ru', 'fr', 'en', 'de', 'zh-cn', 'pt-br', 'ja', 'es']
 DEFAULT_LANGUAGE = 'en'
