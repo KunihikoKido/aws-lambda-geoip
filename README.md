@@ -140,3 +140,29 @@ fab aws-getconfig
 ビルド済みの``lambda_function.zip``は以下のURLを参照してください。
 
 https://github.com/KunihikoKido/aws-lambda-geoip/releases
+
+## with Amazon API Gateway
+### _Example Settings_
+
+_Method and Resources:_
+
+```
+GET /geoip
+```
+
+_Query Strings:_
+* ``ip``: IPアドレス
+* ``lang``: 結果表示言語
+
+_Request mapping template:_
+```json
+{
+  "ip_address": ["$util.urlDecode($input.params('ip'))"],
+  "lang": "$util.urlDecode($input.params('lang'))"
+}
+```
+
+_Example Request:_
+```bash
+GET /geoip?ip=61.204.31.74&lang=ja
+```
